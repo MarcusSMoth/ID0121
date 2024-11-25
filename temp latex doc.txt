@@ -1,0 +1,122 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18} 
+
+\usepackage{minted}
+
+\begin{document}
+
+\title{
+    \textbf{Queue}
+}
+\author{Marcus Söderlund}
+\date{Fall 2024}
+
+\maketitle
+
+\section*{Introduction}
+Sometimes when you buy stuff you have to stand in a queue, but what are queues in a data sense? Queues work by using a \textit{first-in-first} out style of storage. So the first element that is added to the queue is then the first to be reached. It works almost like an stack but reverse. They have an time complexity of $O(1)$ for both insert and delete and $O(n)$ for search since you can keep track of the last element and the first element. Queues can be used for various tasks like managing data flows since you can keep track of what to handle first. Since the queue is built of object you can also store whatever information that you want in them.
+
+\section*{Queue}
+We made the queue by using nodes. the nodes stored the information of where the next item is and what info we have in queue. They are the initiated in by defining a head that points too the first node in the queue. This then makes a list of the items until the last node that just points to null. Then we had a pointer that was at the en called tail, we can use this to look at the last node without going through the whole list to find it. Then the operations were implemented, we have an \textit{enqueue} that adds an item at the end of the queue and the \textit{dequeue} that returns the first value in the queue and removes it.
+
+\newpage
+\section*{Tail vs no tail pointer}
+When making an queue you can do it with or without a tail pointer but what are the differences. The big difference is how the \textit{enqueue} works and it's ordo value change. Without tail the method looks like this:
+\begin{minted}{java}
+public void enqueue(Integer item) {
+        Node temp = head;
+        while (temp.next != null) {
+            temp = temp.next;
+        }
+        temp.next = new Node(item, null);
+    }
+\end{minted}
+This method goes through all the nodes in the list to find the last one and then adds the new queue item on the end but this is not effective since it has an ordo value of $O(n)$ since the size of the array is directly proportional to the amount of nodes you need to go through. but to avoid this the tail comes in since then we know where the last node is at all times and don't need to go through the array the last node. This also makes the code more simple:
+\begin{minted}{java}
+    public void enqueue(Integer item) {
+        tail.next = new Node(item, null);
+        tail = tail.next;
+    }
+\end{minted}
+This is better since we don't need to go through all the nodes and can instead just jump there directly resulting in an ordo value of $O(1)$. But making the \textit{dequeue} is more complicated with the tail since you have to account for the tail when removing the last node you can see that in the \textit{dequeue} with tail it accounts for more then the one without. Here you can see the difference, without tail:
+\begin{minted}{java}
+public Integer dequeue() {
+        if (head.next == null) {
+            return null;
+        }
+        Node temp = head.next;
+        head.next = head.next.next;
+        return temp.item;
+    }
+\end{minted}
+The method with a tail:
+\begin{minted}{java}
+public Integer dequeue() {
+        Integer value = 0;
+        if (head.next != null) {
+            if (head.next.equals(tail)) {
+                tail = head;
+            }
+            value = head.next.item;
+            head.next = head.next.next;
+        }
+
+        else {
+        return null;
+        }
+        return value;
+    }
+\end{minted}
+
+But it being more complicated is not a worry since in the end it's much faster the the one without tail. We ran some benchmarks on both of them where we tried adding different amounts of element to a queue and timing them to see how fast they are. We can clearly see that the tail version is quicker and scales better in the tables below:
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{l|c|c}
+\textbf{prgm} & \textbf{size} & \textbf{time}\\
+\hline
+100 & 0.4 \\
+200 & 0.8 \\
+400 & 1.7 \\            They are nano divided by 1000 make sure it's micro seconds
+800 & 3.4 \\
+1600 & 6.9 \\
+3200 & 13.8 \\
+6400 & 28.1 \\
+12800 & 136.5 \\
+\end{tabular}
+\caption{Time for the queue to add n elements in micro seconds}
+\label{tab:table1}
+\end{center}
+\end{table}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{l|c|c}
+\textbf{prgm} & \textbf{size} & \textbf{time}\\
+\hline
+100 & 8.3 \\
+200 & 32.9 \\
+400 & 125.5 \\
+800 & 484.2 \\               They are nano divided by 1000 make sure it's micro seconds
+1600 & 1934.9 \\
+3200 & 7757.1 \\
+6400 & 31086.4 \\
+12800 & 125422.0 \\
+\end{tabular}
+\caption{Time for the queue to add n elements in micro seconds}
+\label{tab:table1}
+\end{center}
+\end{table}
+
+The one with the tail increasse linear with the size of the arrays and that is due to the method having a ordo value of $O(1)$, it achives this by alway knowing where the last node is so it only need s to go to one no matter how long the queue is. There was a jump when we came to 12800 long queue an that is probabaly due to memmory allocation problems or that the java garbage dumb kicks in. The one without the tail increases with $O(n)$, we can see this in the table though since we increase the size between the values in the arrays have an $O(n^2)$ increase. This is due to it needing to go through all the nodes so if you double the queue length then you double the amount of elements to look through. this is very consistent since we always go to the end so the best and worst case is both $O(n)$. Benchmarks were made so that the JIT and cache would be kicked in before the values we measure  so we get an accurate depiction of how they function.
+
+\section*{summary}
+
+\end{document}

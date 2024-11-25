@@ -1,0 +1,12 @@
+Stacks
+Stack is an abstract data structure with two operations push(val) and pop(). push adds a new value at the
+"top" of the stack, pop takes the value at the "top" of the stack.
+
+CPU needs a register for the start and top so it doesn't need to many registers
+
+What if top is greater then the size of the array? make it dynamic, make a larger array and send it to that one, don't allow it. But you always need to check the size. In c it overwrites what comes after in memory
+
+3 4 + 2 4 + *
+7 6 *
+
+
